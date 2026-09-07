@@ -34,11 +34,10 @@ yarn-error.log*
 .env
 .env*.local
 
-# prisma
-prisma/migrations/
-
 # vercel
 .vercel
+
+.claude/
 
 # typescript
 *.tsbuildinfo

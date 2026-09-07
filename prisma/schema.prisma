@@ -10,13 +10,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// TODO: Define your data models here
-// Example:
-// model User {
-//   id        Int      @id @default(autoincrement())
-//   email     String   @unique
-//   username  String   @unique
-//   password  String
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  username      String         @unique
+  password      String         // hash argon2
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  articles      Article[]
+  comments      Comment[]
+  subscriptions Subscription[]
+
+  @@map("users")
+}
+
+model Theme {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  description   String?
+  createdAt     DateTime       @default(now())
+
+  articles      Article[]
+  subscriptions Subscription[]
+
+  @@map("themes")
+}
+
+model Subscription {
+  id           String   @id @default(cuid())
+  userId       String
+  themeId      String
+  subscribedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, themeId]) // empêche un double abonnement au même thème
+  @@map("subscriptions")
+}
+
+model Article {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  authorId  String
+  themeId   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  theme     Theme     @relation(fields: [themeId], references: [id], onDelete: Restrict)
+  comments  Comment[]
+
+  @@map("articles")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  articleId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
