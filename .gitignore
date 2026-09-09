@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+/app/.next/
 
 # production
 /build
@@ -34,11 +35,10 @@ yarn-error.log*
 .env
 .env*.local
 
-# prisma
-prisma/migrations/
-
 # vercel
 .vercel
+
+.claude/
 
 # typescript
 *.tsbuildinfo

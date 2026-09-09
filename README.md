@@ -40,11 +40,13 @@ docker start mdd-postgres
 ### Configuration
 
 1. Copier le fichier d'environnement :
+
 ```bash
 cp .env.example .env
 ```
 
 2. Les variables par défaut dans `.env` correspondent au conteneur Docker ci-dessus :
+
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/mdd_db?schema=public"
 AUTH_SECRET="your-secret-key-here-change-in-production"
@@ -52,6 +54,7 @@ AUTH_URL="http://localhost:3000"
 ```
 
 3. Initialiser la base de données :
+
 ```bash
 npx prisma generate
 npx prisma db push

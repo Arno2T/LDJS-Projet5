@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export const Home = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background">
@@ -10,9 +14,7 @@ export const Home = () => {
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold text-foreground">
-          Monde de Dév
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground">Monde de Dév</h1>
 
         <div className="flex gap-4">
           <Link

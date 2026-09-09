@@ -1,0 +1,19 @@
+# dependencies
+node_modules
+
+# next.js build output
+.next
+out
+build
+
+# generated / auto-managed files
+next-env.d.ts
+*.tsbuildinfo
+package-lock.json
+
+# prisma generated migrations (SQL, not JS/TS — not Prettier's job)
+prisma/migrations
+
+# misc
+.env
+.env.*
