@@ -8,12 +8,12 @@ import { Theme } from "@prisma/client";
  *
  * @returns Theme list, sorted by name (A → Z).
  */
-const getThemes = async (): Promise<Theme[]>  => {
+const getThemes = async (): Promise<Theme[]> => {
   return await prisma.theme.findMany({
     orderBy: {
-      name: "asc"
-    }
-  })
-}
+      name: "asc",
+    },
+  });
+};
 
 export { getThemes };
