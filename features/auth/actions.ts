@@ -6,6 +6,12 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import type { User } from "@prisma/client";
 import z from "zod";
+import {
+  getSession,
+  createSession,
+  setSessionCookie,
+  deleteSessionCookie,
+} from "@/lib/auth/session";
 
 export const registerUser = async (
   data: z.infer<typeof registerSchema>,
@@ -20,8 +26,8 @@ export const registerUser = async (
       data: { email, username, password: hashedPassword },
     });
 
-    const token =
-      "une string pour l'instant, mais on va utiliser jose pour le générer j'imagine ?";
+    const token = await createSession(user.id);
+    await setSessionCookie(token);
 
     return { user, token };
   } catch (error) {
@@ -57,7 +63,21 @@ export const login = async (
   if (!isPasswordValid) {
     throw invalidCredentialsError;
   }
-  const token = "placeholder-token";
+
+  const token = await createSession(user.id);
+  await setSessionCookie(token);
 
   return { user, token };
 };
+
+export const getCurrentUser = async (): Promise<User | null> => {
+  const userId = await getSession();
+
+  if (!userId) {
+    return null;
+  }
+
+  return await prisma.user.findUnique({ where: { id: userId } });
+};
+
+export const logout = async () => await deleteSessionCookie();
