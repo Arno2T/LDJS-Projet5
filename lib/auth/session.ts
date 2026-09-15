@@ -1,5 +1,7 @@
-import { jwtVerify, SignJWT } from "jose";
+import "server-only";
 import { cookies } from "next/headers";
+import { jwtVerify, SignJWT } from "jose";
+import { redirect } from "next/navigation";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
@@ -48,4 +50,14 @@ export const getSession = async () => {
 export const deleteSessionCookie = async () => {
   const cookieStore = await cookies();
   cookieStore.delete("userSession");
+};
+
+export const requireAuth = async (): Promise<string> => {
+  const userId = await getSession();
+
+  if (!userId) {
+    redirect("/login");
+  }
+
+  return userId;
 };
