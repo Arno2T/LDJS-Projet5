@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { hashPassword, isPasswordVerified } from "@/lib/auth/password";
 import { registerSchema, loginSchema } from "./schemas";
 import { prisma } from "@/lib/prisma";
@@ -13,12 +14,30 @@ import {
   deleteSessionCookie,
 } from "@/lib/auth/session";
 
-export const registerUser = async (
-  data: z.infer<typeof registerSchema>,
-): Promise<{ user: User; token: string }> => {
-  registerSchema.parse(data);
+export type LoginFormState = { message?: string } | undefined;
+export type RegisterFormState =
+  | {
+      errors?: {
+        username?: string[];
+        email?: string[];
+        password?: string[];
+      };
+      message: string;
+    }
+  | undefined;
 
-  const { email, username, password } = data;
+export const registerUser = async (
+  _prevState: RegisterFormState,
+  formData: FormData,
+): Promise<RegisterFormState> => {
+  const rawData = Object.fromEntries(formData);
+  const validatedFileds = registerSchema.safeParse(rawData);
+
+  if (!validatedFileds.success) {
+    return { errors: validatedFileds.error.flatten().fieldErrors, message: "" };
+  }
+
+  const { email, username, password } = validatedFileds.data;
   const hashedPassword = await hashPassword(password);
 
   try {
@@ -28,26 +47,31 @@ export const registerUser = async (
 
     const token = await createSession(user.id);
     await setSessionCookie(token);
-
-    return { user, token };
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      throw new Error("Cet e-mail ou ce nom d'utilisateur est déjà utilisé");
+      return { message: "Cet e-mail ou ce nom d'utlisateur est déjà utilisé" };
     }
     throw error;
   }
+
+  redirect("/themes");
 };
 
 export const login = async (
-  data: z.infer<typeof loginSchema>,
-): Promise<{ user: User; token: string }> => {
-  loginSchema.parse(data);
+  _prevState: LoginFormState,
+  formData: FormData,
+): Promise<LoginFormState> => {
+  const rawData = Object.fromEntries(formData);
+  const validatedFields = loginSchema.safeParse(rawData);
 
-  const { login, password } = data;
-  const invalidCredentialsError = new Error("Email ou mot de passe non valide");
+  if (!validatedFields.success) {
+    return { message: "Veuillez renseigner vos identifiants" };
+  }
+
+  const { login, password } = validatedFields.data;
 
   const user = await prisma.user.findFirst({
     where: {
@@ -56,18 +80,19 @@ export const login = async (
   });
 
   if (!user) {
-    throw invalidCredentialsError;
+    return { message: "Email ou mot de passe non valide" };
   }
 
   const isPasswordValid = await isPasswordVerified(user.password, password);
   if (!isPasswordValid) {
-    throw invalidCredentialsError;
+    return { message: "Email ou mot de passe non valide" };
   }
 
   const token = await createSession(user.id);
   await setSessionCookie(token);
 
-  return { user, token };
+  // TODO: redirect to articles
+  redirect("/themes");
 };
 
 export const getCurrentUser = async (): Promise<User | null> => {
