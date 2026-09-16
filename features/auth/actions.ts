@@ -52,7 +52,7 @@ export const registerUser = async (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      return { message: "Cet e-mail ou ce nom d'utlisateur est déjà utilisé" };
+      return { message: "Cet e-mail ou ce nom d'utilisateur est déjà utilisé" };
     }
     throw error;
   }
