@@ -5,6 +5,6 @@ const ProfileIcon = () => {
       <div className="w-[25px] h-[9px] rounded-t-[90%] border-2 border-t-black border-x-black border-b-transparent opacity-50"></div>
     </div>
   );
-}
+};
 
 export default ProfileIcon;
