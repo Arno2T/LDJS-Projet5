@@ -56,7 +56,7 @@ export const requireAuth = async (): Promise<string> => {
   const userId = await getSession();
 
   if (!userId) {
-    redirect("/login");
+    redirect("/");
   }
 
   return userId;
