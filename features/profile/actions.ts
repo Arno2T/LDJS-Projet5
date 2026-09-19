@@ -1,12 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/auth/session";
 import { registerSchema } from "@/features/auth/schemas";
 import { RegisterFormState } from "@/features/auth/actions";
 import { hashPassword } from "@/lib/auth/password";
+import { parseFormData } from "@/lib/forms";
+import { isUniqueConstraintError } from "@/lib/prisma-errors";
 
 const getUserInformation = async (): Promise<{
   email: string;
@@ -29,8 +30,7 @@ const updateUserInformation = async (
   _prevState: RegisterFormState,
   formData: FormData,
 ): Promise<RegisterFormState> => {
-  const rawData = Object.fromEntries(formData);
-  const validatedFields = registerSchema.safeParse(rawData);
+  const validatedFields = parseFormData(registerSchema, formData);
   const userId = await requireAuth();
 
   if (!validatedFields.success) {
@@ -46,10 +46,7 @@ const updateUserInformation = async (
       data: { email, username, password: hashedPassword },
     });
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (isUniqueConstraintError(error)) {
       return { message: "Cet e-mail ou ce nom d'utilisateur est déjà utilisé" };
     }
     throw error;

@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { hashPassword, isPasswordVerified } from "@/lib/auth/password";
 import { registerSchema, loginSchema } from "./schemas";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 import type { User } from "@prisma/client";
-import z from "zod";
+import { parseFormData } from "@/lib/forms";
+import { isUniqueConstraintError } from "@/lib/prisma-errors";
 import {
   getSession,
   createSession,
@@ -30,8 +30,7 @@ export const registerUser = async (
   _prevState: RegisterFormState,
   formData: FormData,
 ): Promise<RegisterFormState> => {
-  const rawData = Object.fromEntries(formData);
-  const validatedFields = registerSchema.safeParse(rawData);
+  const validatedFields = parseFormData(registerSchema, formData);
 
   if (!validatedFields.success) {
     return { errors: validatedFields.error.flatten().fieldErrors, message: "" };
@@ -48,10 +47,7 @@ export const registerUser = async (
     const token = await createSession(user.id);
     await setSessionCookie(token);
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (isUniqueConstraintError(error)) {
       return { message: "Cet e-mail ou ce nom d'utilisateur est déjà utilisé" };
     }
     throw error;
@@ -64,8 +60,7 @@ export const login = async (
   _prevState: LoginFormState,
   formData: FormData,
 ): Promise<LoginFormState> => {
-  const rawData = Object.fromEntries(formData);
-  const validatedFields = loginSchema.safeParse(rawData);
+  const validatedFields = parseFormData(loginSchema, formData);
 
   if (!validatedFields.success) {
     return { message: "Veuillez renseigner vos identifiants" };
@@ -106,7 +101,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
   return await prisma.user.findUnique({ where: { id: userId } });
 };
 
-export const logout = async () => {
+export const logout = async (): Promise<void> => {
   await deleteSessionCookie();
 
   redirect("/");
