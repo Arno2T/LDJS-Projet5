@@ -31,13 +31,13 @@ export const registerUser = async (
   formData: FormData,
 ): Promise<RegisterFormState> => {
   const rawData = Object.fromEntries(formData);
-  const validatedFileds = registerSchema.safeParse(rawData);
+  const validatedFields = registerSchema.safeParse(rawData);
 
-  if (!validatedFileds.success) {
-    return { errors: validatedFileds.error.flatten().fieldErrors, message: "" };
+  if (!validatedFields.success) {
+    return { errors: validatedFields.error.flatten().fieldErrors, message: "" };
   }
 
-  const { email, username, password } = validatedFileds.data;
+  const { email, username, password } = validatedFields.data;
   const hashedPassword = await hashPassword(password);
 
   try {
@@ -77,6 +77,7 @@ export const login = async (
     where: {
       OR: [{ email: login }, { username: login }],
     },
+    omit: { password: false },
   });
 
   if (!user) {
@@ -105,4 +106,8 @@ export const getCurrentUser = async (): Promise<User | null> => {
   return await prisma.user.findUnique({ where: { id: userId } });
 };
 
-export const logout = async () => await deleteSessionCookie();
+export const logout = async () => {
+  await deleteSessionCookie();
+
+  redirect("/");
+};

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Article } from "@prisma/client";
 import { getSubscriptionsByUser } from "../subscriptions/actions";
 
-const getArticles = async () => {
+const getArticles = async (): Promise<Article[]> => {
   await requireAuth();
   const subscriptions = await getSubscriptionsByUser();
 
