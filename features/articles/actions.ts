@@ -2,7 +2,7 @@
 
 import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
-import { Article, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { getSubscriptionsByUser } from "../subscriptions/actions";
 
 export type ArticleWithAuthor = Prisma.ArticleGetPayload<{
