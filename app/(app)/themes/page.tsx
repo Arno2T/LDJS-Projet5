@@ -3,6 +3,7 @@ import {
   getSubscriptionsByUser,
   subscribe,
 } from "@/features/subscriptions/actions";
+import ThemeCard from "@/components/ThemeCard";
 
 /**
  * Themes page (`/themes`).
@@ -21,23 +22,16 @@ export default async function Page() {
   const subscriptions = await getSubscriptionsByUser();
   const themeSubscribedList: Set<string> = new Set();
   subscriptions.forEach((el) => themeSubscribedList.add(el.themeId));
-  const listThemes = themes.map((theme) => {
-    return (
-      <li key={theme.id}>
-        <p>
-          <b>{theme.name}</b>
-          {" " + (theme.description || "") + " "}
-        </p>
-
-        <form action={subscribe.bind(null, theme.id)}>
-          <button type="submit" disabled={themeSubscribedList.has(theme.id)}>
-            {" "}
-            {themeSubscribedList.has(theme.id) ? "Déjà abonné" : "S'abonner"}
-          </button>
-        </form>
-      </li>
-    );
-  });
-
-  return <ul>{listThemes}</ul>;
+  return (
+    <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
+      {themes.map((theme) => (
+        <ThemeCard
+          key={theme.id}
+          theme={theme}
+          isSubscribed={themeSubscribedList.has(theme.id)}
+          subscribeAction={subscribe.bind(null, theme.id)}
+        />
+      ))}
+    </div>
+  );
 }
