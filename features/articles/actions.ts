@@ -2,11 +2,15 @@
 
 import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Article, Prisma } from "@prisma/client";
 import { getSubscriptionsByUser } from "../subscriptions/actions";
 
 export type ArticleWithAuthor = Prisma.ArticleGetPayload<{
   include: { author: { select: { username: true } } };
+}>;
+
+export type ArticleWithAuthorAndTheme = Prisma.ArticleGetPayload<{
+  include: { author: { select: { username: true } }; theme: true };
 }>;
 
 const getArticles = async (): Promise<ArticleWithAuthor[]> => {
@@ -24,4 +28,15 @@ const getArticles = async (): Promise<ArticleWithAuthor[]> => {
   });
 };
 
-export { getArticles };
+const getArticleById = async (
+  id: string,
+): Promise<ArticleWithAuthorAndTheme | null> => {
+  await requireAuth();
+
+  return await prisma.article.findUnique({
+    where: { id },
+    include: { author: { select: { username: true } }, theme: true },
+  });
+};
+
+export { getArticles, getArticleById };
