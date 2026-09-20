@@ -12,6 +12,7 @@ const Menu = () => {
     >
       <Link href="/articles" className="shrink-0">
         <Image
+          preload={true}
           src="/logo_mdd.png"
           width={140}
           height={81}
