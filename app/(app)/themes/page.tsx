@@ -28,8 +28,11 @@ export default async function Page() {
         <ThemeCard
           key={theme.id}
           theme={theme}
-          isSubscribed={themeSubscribedList.has(theme.id)}
-          subscribeAction={subscribe.bind(null, theme.id)}
+          buttonLabel={
+            themeSubscribedList.has(theme.id) ? "Déjà abonné" : "S'abonner"
+          }
+          buttonDisabled={themeSubscribedList.has(theme.id)}
+          buttonAction={subscribe.bind(null, theme.id)}
         />
       ))}
     </div>

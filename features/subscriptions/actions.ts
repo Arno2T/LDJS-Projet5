@@ -6,7 +6,7 @@ import {
   isUniqueConstraintError,
   isRecordNotFoundError,
 } from "@/lib/prisma-errors";
-import { Subscription } from "@prisma/client";
+import { Prisma, Subscription } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -17,6 +17,17 @@ const getSubscriptionsByUser = async (): Promise<Subscription[]> => {
 
   return prisma.subscription.findMany({
     where: { userId },
+  });
+};
+
+const getSubscriptionsWithTheme = async (): Promise<
+  Prisma.SubscriptionGetPayload<{ include: { theme: true } }>[]
+> => {
+  const userId = await requireAuth();
+
+  return prisma.subscription.findMany({
+    where: { userId },
+    include: { theme: true },
   });
 };
 
@@ -64,4 +75,9 @@ const unsubscribe = async (
   }
 };
 
-export { getSubscriptionsByUser, subscribe, unsubscribe };
+export {
+  getSubscriptionsByUser,
+  getSubscriptionsWithTheme,
+  subscribe,
+  unsubscribe,
+};

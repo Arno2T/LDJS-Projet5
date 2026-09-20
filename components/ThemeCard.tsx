@@ -11,14 +11,16 @@ import { Button } from "@/components/ui/button";
 
 type ThemeCardProps = {
   theme: Theme;
-  isSubscribed: boolean;
-  subscribeAction: (formData: FormData) => void | Promise<void>;
+  buttonLabel: string;
+  buttonAction: (formData: FormData) => void | Promise<void>;
+  buttonDisabled?: boolean;
 };
 
 const ThemeCard = ({
   theme,
-  isSubscribed,
-  subscribeAction,
+  buttonLabel,
+  buttonAction,
+  buttonDisabled,
 }: ThemeCardProps) => {
   return (
     <Card className="min-h-[181px] w-full max-w-[265px] justify-between gap-3 border-0 shadow-none bg-[#F5F5F5] py-4 md:min-h-[161px] md:max-w-[392px]">
@@ -31,13 +33,13 @@ const ThemeCard = ({
         </CardDescription>
       </CardContent>
       <CardFooter className="justify-center">
-        <form action={subscribeAction}>
+        <form action={buttonAction}>
           <Button
             type="submit"
-            disabled={isSubscribed}
+            disabled={buttonDisabled}
             className="h-10 w-[139px] disabled:bg-[#939393] disabled:text-white disabled:opacity-100 md:w-[167px]"
           >
-            {isSubscribed ? "Déjà abonné" : "S'abonner"}
+            {buttonLabel}
           </Button>
         </form>
       </CardFooter>
