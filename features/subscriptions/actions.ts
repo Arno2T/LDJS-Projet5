@@ -2,7 +2,12 @@
 
 import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
-import { Subscription } from "@prisma/client";
+import {
+  isUniqueConstraintError,
+  isRecordNotFoundError,
+} from "@/lib/prisma-errors";
+import { Prisma, Subscription } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 /**
  * get the subscriptions for current user
@@ -15,8 +20,64 @@ const getSubscriptionsByUser = async (): Promise<Subscription[]> => {
   });
 };
 
-const subscribe = async () => {};
+const getSubscriptionsWithTheme = async (): Promise<
+  Prisma.SubscriptionGetPayload<{ include: { theme: true } }>[]
+> => {
+  const userId = await requireAuth();
 
-const unsubscribe = async () => {};
+  return prisma.subscription.findMany({
+    where: { userId },
+    include: { theme: true },
+  });
+};
 
-export { getSubscriptionsByUser };
+const subscribe = async (
+  themeId: string,
+  _formData: FormData,
+): Promise<void> => {
+  const userId = await requireAuth();
+
+  try {
+    await prisma.subscription.create({
+      data: { userId, themeId },
+    });
+
+    revalidatePath("/themes");
+    revalidatePath("/profile");
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      console.error(error);
+    } else {
+      throw error;
+    }
+  }
+};
+
+const unsubscribe = async (
+  themeId: string,
+  _formData: FormData,
+): Promise<void> => {
+  const userId = await requireAuth();
+
+  try {
+    await prisma.subscription.delete({
+      where: { userId_themeId: { userId, themeId } },
+    });
+
+    revalidatePath("/themes");
+    revalidatePath("/profile");
+  } catch (error) {
+    if (isRecordNotFoundError(error)) {
+      console.error(error);
+    } else {
+      throw error;
+    }
+  }
+};
+
+export {
+  getSubscriptionsByUser,
+  getSubscriptionsWithTheme,
+  subscribe,
+  unsubscribe,
+};
