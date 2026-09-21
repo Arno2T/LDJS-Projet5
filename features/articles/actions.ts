@@ -13,17 +13,26 @@ export type ArticleWithAuthorAndTheme = Prisma.ArticleGetPayload<{
   include: { author: { select: { username: true } }; theme: true };
 }>;
 
-const getArticles = async (): Promise<ArticleWithAuthor[]> => {
+/**
+ * Returns the articles of the themes the current user is subscribed to.
+ *
+ * @param sortParam - Order on `createdAt`. `"asc"` = oldest first. Any other
+ * value (or none) falls back to `"desc"` (newest first).
+ */
+const getArticles = async (
+  sortParam?: string,
+): Promise<ArticleWithAuthor[]> => {
   await requireAuth();
   const subscriptions = await getSubscriptionsByUser();
 
   const themeIds = subscriptions.map((sub) => sub.themeId);
+  const order: Prisma.SortOrder = sortParam === "asc" ? "asc" : "desc";
 
   return prisma.article.findMany({
     where: { themeId: { in: themeIds } },
     include: { author: { select: { username: true } } },
     orderBy: {
-      createdAt: "desc",
+      createdAt: order,
     },
   });
 };

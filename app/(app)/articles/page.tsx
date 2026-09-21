@@ -10,9 +10,15 @@ import { getArticles } from "@/features/articles/actions";
  * subscribed to (newest first) as a responsive grid of `ArticleCard`. An
  * action bar above the grid holds the "create article" button and the
  * "sort by" control.
+ * @param searchParams -
  */
-export default async function Page() {
-  const articles = await getArticles();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string }>;
+}) {
+  const { sort } = await searchParams;
+  const articles = await getArticles(sort);
 
   return (
     <div className="mx-auto max-w-[1272px]">
