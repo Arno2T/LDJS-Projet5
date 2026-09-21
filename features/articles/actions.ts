@@ -1,4 +1,9 @@
 "use server";
+import { parseFormData } from "@/lib/forms";
+import { isForeignKeyError } from "@/lib/prisma-errors";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createArticleSchema } from "./schemas";
 
 import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
@@ -12,6 +17,13 @@ export type ArticleWithAuthor = Prisma.ArticleGetPayload<{
 export type ArticleWithAuthorAndTheme = Prisma.ArticleGetPayload<{
   include: { author: { select: { username: true } }; theme: true };
 }>;
+
+export type CreateArticleFormState =
+  | {
+      errors?: { themeId?: string[]; title?: string[]; content?: string[] };
+      message: string;
+    }
+  | undefined;
 
 /**
  * Returns the articles of the themes the current user is subscribed to.
@@ -48,4 +60,40 @@ const getArticleById = async (
   });
 };
 
-export { getArticles, getArticleById };
+/**
+ * Creates an article for the current user from a submitted form.
+ * The author always comes from the session, never from the form.
+ * Redirects to the new article on success.
+ */
+const createArticle = async (
+  _prevState: CreateArticleFormState,
+  formData: FormData,
+): Promise<CreateArticleFormState> => {
+  const userId = await requireAuth();
+  const validatedFields = parseFormData(createArticleSchema, formData);
+
+  if (!validatedFields.success) {
+    return { errors: validatedFields.error.flatten().fieldErrors, message: "" };
+  }
+
+  const { themeId, title, content } = validatedFields.data;
+  let articleId: string;
+
+  try {
+    const article = await prisma.article.create({
+      data: { title, content, themeId, authorId: userId },
+      select: { id: true },
+    });
+    articleId = article.id;
+  } catch (error) {
+    if (isForeignKeyError(error)) {
+      return { message: "Ce thème n'existe pas" };
+    }
+    throw error;
+  }
+
+  revalidatePath("/articles");
+  redirect(`/articles/${articleId}`);
+};
+
+export { getArticles, getArticleById, createArticle };
