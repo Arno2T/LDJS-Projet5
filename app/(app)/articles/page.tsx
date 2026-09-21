@@ -1,15 +1,14 @@
+import ArticleCard from "@/components/ArticleCard";
 import { getArticles } from "@/features/articles/actions";
 
 export default async function Page() {
   const articles = await getArticles();
 
-  const listArticles = articles.map((article) => {
-    return (
-      <li key={article.id}>
-        <p>{article.title}</p>
-        <p>{article.content}</p>
-      </li>
-    );
-  });
-  return <ul>{listArticles}</ul>;
+  return (
+    <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
+      {articles.map((article) => (
+        <ArticleCard key={article.id} article={article} />
+      ))}
+    </div>
+  );
 }
