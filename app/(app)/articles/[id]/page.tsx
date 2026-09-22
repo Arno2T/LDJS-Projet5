@@ -10,6 +10,11 @@ import { getArticleById } from "@/features/articles/actions";
  * author, theme and content, with a link back to the article feed.
  * Triggers a 404 when the article does not exist.
  *
+ * Layout: the back arrow sits on its own row, except on large screens where
+ * the header is a 3-column grid (`1fr minmax(0,800px) 1fr`) so the title lines
+ * up with the content block below. Title, metadata and content share an
+ * 800px centered column and are all left-aligned.
+ *
  * @param props - Route props. `params` is a Promise since Next.js 15.
  *
  * @remarks
@@ -29,27 +34,28 @@ export default async function Page({
   }
 
   return (
-    <article className="grid grid-cols-[auto_1fr] gap-x-5 py-6 pr-6 pl-[45px]">
-      <Link
-        href="/articles"
-        aria-label="Retour aux articles"
-        className="flex h-8 items-center"
-      >
-        <MoveLeft size={47} absoluteStrokeWidth />
-      </Link>
-      <h1 className="min-h-[48px] w-full min-w-0 max-w-[265px] text-2xl font-semibold md:max-w-[728px]">
-        {article.title}
-      </h1>
+    <article className="px-6 py-6">
+      <div className="grid grid-cols-1 gap-y-4 lg:grid-cols-[1fr_minmax(0,800px)_1fr] lg:items-center">
+        {/* pl-[21px] + px-6 (24px) = 45px, same left offset as before */}
+        <Link
+          href="/articles"
+          aria-label="Retour aux articles"
+          className="flex h-8 items-center justify-self-start pl-[21px]"
+        >
+          <MoveLeft size={47} absoluteStrokeWidth />
+        </Link>
+        <h1 className="min-h-[48px] w-full min-w-0 max-w-[265px] text-left text-2xl font-semibold md:mx-auto md:max-w-[800px]">
+          {article.title}
+        </h1>
+      </div>
 
-      <div className="col-span-2 min-w-0 md:col-span-1 md:col-start-2">
-        <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xl">
+      <div className="mx-auto mt-6 max-w-[800px]">
+        <div className="flex flex-wrap justify-start gap-x-5 gap-y-2 text-xl">
           <span>{new Date(article.createdAt).toLocaleDateString("fr-FR")}</span>
           <span>{article.author.username}</span>
           <span className="basis-full md:basis-auto">{article.theme.name}</span>
         </div>
-        <p className="mt-6 max-w-[728px] whitespace-pre-wrap">
-          {article.content}
-        </p>
+        <p className="mt-6 whitespace-pre-wrap">{article.content}</p>
       </div>
     </article>
   );
