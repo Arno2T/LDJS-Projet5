@@ -23,6 +23,7 @@ export type CreateArticleFormState =
   | {
       errors?: { themeId?: string[]; title?: string[]; content?: string[] };
       message: string;
+      values?: { themeId: string; title: string; content: string };
     }
   | undefined;
 
@@ -72,9 +73,18 @@ const createArticle = async (
 ): Promise<CreateArticleFormState> => {
   const userId = await requireAuth();
   const validatedFields = parseFormData(createArticleSchema, formData);
+  const values = {
+    themeId: String(formData.get("themeId") ?? ""),
+    title: String(formData.get("title") ?? ""),
+    content: String(formData.get("content") ?? ""),
+  };
 
   if (!validatedFields.success) {
-    return { errors: validatedFields.error.flatten().fieldErrors, message: "" };
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "",
+      values,
+    };
   }
 
   const { themeId, title, content } = validatedFields.data;
@@ -88,7 +98,7 @@ const createArticle = async (
     articleId = article.id;
   } catch (error) {
     if (isForeignKeyError(error)) {
-      return { message: "Ce thème n'existe pas" };
+      return { message: "Ce thème n'existe pas", values };
     }
     throw error;
   }

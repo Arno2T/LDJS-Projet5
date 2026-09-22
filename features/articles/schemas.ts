@@ -8,11 +8,14 @@ export const createArticleSchema = z.object({
   title: z
     .string({ required_error: "Le titre est obligatoire" })
     .trim()
-    .min(1, "Le titre est obligatoire")
+    .min(
+      10,
+      "Le titre est obligatoire, 10 caractères minimum, 100 caractères maximum",
+    )
     .max(100, "Maximum 100 caractères"),
 
   content: z
     .string({ required_error: "Le contenu est obligatoire" })
     .trim()
-    .min(1, "Le contenu est obligatoire"),
+    .min(300, "Le contenu est obligatoire, 300 caractères minimum"),
 });
