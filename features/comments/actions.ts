@@ -4,6 +4,7 @@ import { requireAuth } from "@/lib/auth/session";
 import { parseFormData } from "@/lib/forms";
 import { prisma } from "@/lib/prisma";
 import { isForeignKeyError } from "@/lib/prisma-errors";
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { commentSchema } from "./schemas";
 
@@ -24,6 +25,10 @@ export type CreateCommentFormState =
       values?: { content: string };
     }
   | undefined;
+
+export type CommentWithAuthor = Prisma.CommentGetPayload<{
+  include: { author: { select: { username: true } } };
+}>;
 
 /**
  * Creates a comment for the current user on a given article.
@@ -80,4 +85,22 @@ const createComment = async (
   revalidatePath(`/articles/${articleId}`);
 };
 
-export { createComment };
+/**
+ * Returns the comments posted on a given article, most recent first, with
+ * each comment's author username.
+ *
+ * @param articleId - Id of the article whose comments are fetched.
+ */
+const getCommentsByArticle = async (
+  articleId: string,
+): Promise<CommentWithAuthor[]> => {
+  await requireAuth();
+
+  return await prisma.comment.findMany({
+    where: { articleId },
+    include: { author: { select: { username: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+export { createComment, getCommentsByArticle };
