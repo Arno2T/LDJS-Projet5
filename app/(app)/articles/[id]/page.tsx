@@ -2,13 +2,15 @@ import { MoveLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getArticleById } from "@/features/articles/actions";
+import { getCommentsByArticle } from "@/features/comments/actions";
+import { CreateCommentForm } from "@/features/comments/CreateCommentForm";
 
 /**
  * Article detail page (`/articles/[id]`).
  *
  * Server Component that displays a single article in full: title, date,
- * author, theme and content, with a link back to the article feed.
- * Triggers a 404 when the article does not exist.
+ * author, theme and content, with a link back to the article feed, followed
+ * by its comments. Triggers a 404 when the article does not exist.
  *
  * Layout: the back arrow sits on its own row, except on large screens where
  * the header is a 3-column grid (`1fr minmax(0,800px) 1fr`) so the title lines
@@ -16,9 +18,6 @@ import { getArticleById } from "@/features/articles/actions";
  * 800px centered column and are all left-aligned.
  *
  * @param props - Route props. `params` is a Promise since Next.js 15.
- *
- * @remarks
- * The comments section shown in the Figma mockup is not implemented yet.
  */
 
 export default async function Page({
@@ -27,7 +26,10 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const article = await getArticleById(id);
+  const [article, comments] = await Promise.all([
+    getArticleById(id),
+    getCommentsByArticle(id),
+  ]);
 
   if (!article) {
     notFound();
@@ -56,6 +58,22 @@ export default async function Page({
           <span className="basis-full md:basis-auto">{article.theme.name}</span>
         </div>
         <p className="mt-6 whitespace-pre-wrap">{article.content}</p>
+      </div>
+
+      <div className="mx-auto mt-6 max-w-[800px]">
+        <h2>Commentaires</h2>
+        {comments.length === 0 ? (
+          <p>Aucun commentaire pour le moment.</p>
+        ) : (
+          <ul>
+            {comments.map((comment) => (
+              <li key={comment.id}>
+                <span>{comment.author.username}</span> : {comment.content}
+              </li>
+            ))}
+          </ul>
+        )}
+        <CreateCommentForm articleId={article.id} />
       </div>
     </article>
   );
