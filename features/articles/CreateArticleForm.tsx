@@ -52,6 +52,7 @@ export function CreateArticleForm({ themes }: Props) {
           id="themeId"
           name="themeId"
           defaultValue={state?.values?.themeId ?? ""}
+          key={state?.values?.themeId ?? "none"}
           aria-label="Thème de l'article"
           aria-invalid={!!state?.errors?.themeId}
           aria-describedby={

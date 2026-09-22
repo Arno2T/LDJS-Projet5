@@ -1,5 +1,14 @@
 import * as z from "zod";
 
+/**
+ * Zod schema of the article creation form.
+ *
+ * - `themeId`: required (an existing theme is checked later by the database).
+ * - `title`: trimmed, 10 to 100 characters.
+ * - `content`: trimmed, at least 300 characters.
+ *
+ * The length limits are a product decision, not imposed by the specs.
+ */
 export const createArticleSchema = z.object({
   themeId: z
     .string({ required_error: "Veuillez sélectionner un thème" })
