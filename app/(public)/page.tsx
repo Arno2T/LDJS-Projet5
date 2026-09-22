@@ -12,7 +12,7 @@ export const Home = () => {
             alt="Logo MDD"
             width={412}
             height={238}
-            priority
+            preload={true}
             className="w-[225px] h-[130px] md:w-[412px] md:h-[238px]"
           />
         </div>

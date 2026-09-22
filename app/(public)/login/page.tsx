@@ -40,6 +40,7 @@ export default function Page() {
             alt="Logo du site MDD"
             width={140}
             height={81}
+            preload={true}
           />
         </Link>
       </header>
@@ -61,7 +62,7 @@ export default function Page() {
               alt="Logo du site MDD"
               width={225}
               height={130}
-              priority
+              preload={true}
             />
           </Link>
 
