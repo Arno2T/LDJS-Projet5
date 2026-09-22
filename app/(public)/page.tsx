@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import Link from "next/link";
 
 export const Home = () => {
@@ -5,26 +7,31 @@ export const Home = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background">
       <div className="text-center space-y-8">
         <div className="flex justify-center">
-          <div className="bg-primary text-primary-foreground text-4xl font-bold px-8 py-4 rounded-2xl">
-            MDD
-          </div>
+          <Image
+            src="/logo_mdd.png"
+            alt="Logo MDD"
+            width={412}
+            height={238}
+            priority
+            className="w-[225px] h-[130px] md:w-[412px] md:h-[238px]"
+          />
         </div>
 
-        <h1 className="text-3xl font-bold text-foreground">Monde de Dév</h1>
-
-        <div className="flex gap-4">
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+        <div className="flex flex-col items-center justify-center gap-10 md:flex-row md:gap-12">
+          <Button
+            variant="outline"
+            asChild
+            className="w-[156px] h-10 bg-white text-black border-black hover:bg-white hover:text-primary hover:border-primary"
           >
-            Se connecter
-          </Link>
-          <Link
-            href="/register"
-            className="inline-flex items-center justify-center px-6 py-3 border-2 border-primary text-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors"
+            <Link href="/login">Se connecter</Link>
+          </Button>
+          <Button
+            variant="outline"
+            asChild
+            className="w-[156px] h-10 bg-white text-black border-black hover:bg-white hover:text-primary hover:border-primary"
           >
-            S&apos;inscrire
-          </Link>
+            <Link href="/register">S&apos;inscrire</Link>
+          </Button>
         </div>
       </div>
     </div>
