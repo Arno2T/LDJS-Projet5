@@ -65,3 +65,32 @@ export async function createTestUser(overrides?: {
     },
   });
 }
+
+/**
+ * Creates an `Article` fixture. `authorId` and `themeId` must reference
+ * existing rows (foreign keys). `createdAt` can be forced to test sorting.
+ */
+export async function createTestArticle(overrides: {
+  authorId: string;
+  themeId: string;
+  title?: string;
+  content?: string;
+  createdAt?: Date;
+}) {
+  const suffix = Math.random().toString(36).slice(2, 8);
+
+  return testPrisma.article.create({
+    data: {
+      title: overrides.title ?? `Article ${suffix}`,
+      content: overrides.content ?? "Test content",
+      authorId: overrides.authorId,
+      themeId: overrides.themeId,
+      ...(overrides.createdAt && { createdAt: overrides.createdAt }),
+    },
+  });
+}
+
+/** Subscribes `userId` to `themeId` (real `Subscription` row). */
+export async function createTestSubscription(userId: string, themeId: string) {
+  return testPrisma.subscription.create({ data: { userId, themeId } });
+}

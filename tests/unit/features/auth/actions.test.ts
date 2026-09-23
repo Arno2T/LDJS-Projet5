@@ -49,7 +49,7 @@ describe("auth actions", () => {
       password: PASSWORD,
     };
 
-    it("creates the user, stores a hashed password, sets the session cookie and redirects to /themes", async () => {
+    it("creates the user, stores a hashed password, sets the session cookie and redirects to /articles", async () => {
       const result = await registerUser(undefined, toFormData(validFields));
 
       // The mocked redirect does not interrupt the action, so it returns.
@@ -64,7 +64,7 @@ describe("auth actions", () => {
       expect(await isPasswordVerified(user.password, PASSWORD)).toBe(true);
 
       expect(await getSession()).toBe(user.id);
-      expect(vi.mocked(redirect)).toHaveBeenCalledWith("/themes");
+      expect(vi.mocked(redirect)).toHaveBeenCalledWith("/articles");
     });
 
     it.each([
@@ -116,7 +116,7 @@ describe("auth actions", () => {
       { identifier: "an email", login: "bobby@mdd-test.local" },
       { identifier: "a username", login: "bobby" },
     ])(
-      "succeeds with $identifier: sets the session cookie and redirects to /themes",
+      "succeeds with $identifier: sets the session cookie and redirects to /articles",
       async ({ login: identifier }) => {
         const result = await login(
           undefined,
@@ -125,7 +125,7 @@ describe("auth actions", () => {
 
         expect(result).toBeUndefined();
         expect(await getSession()).not.toBeNull();
-        expect(vi.mocked(redirect)).toHaveBeenCalledWith("/themes");
+        expect(vi.mocked(redirect)).toHaveBeenCalledWith("/articles");
       },
     );
 

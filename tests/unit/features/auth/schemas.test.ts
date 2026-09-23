@@ -1,17 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { SafeParseReturnType } from "zod";
 import { loginSchema, registerSchema } from "@/features/auth/schemas";
-
-/**
- * Returns the names of the fields that failed validation, so each test can
- * assert *which* rule rejected the input (not just "something failed").
- */
-const failedFields = (
-  result: SafeParseReturnType<unknown, unknown>,
-): string[] =>
-  result.success
-    ? []
-    : result.error.issues.map((issue) => String(issue.path[0]));
+import { failedFields } from "@/tests/setup/zod";
 
 describe("registerSchema", () => {
   // Reference input: every test changes ONE field only, so a failure can
