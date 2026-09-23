@@ -61,19 +61,32 @@ export default async function Page({
       </div>
 
       <div className="mx-auto mt-6 max-w-[800px]">
-        <h2>Commentaires</h2>
+        <hr className="border-border" />
+        <h2 className="mt-6 mb-4 text-xl font-bold">Commentaires</h2>
         {comments.length === 0 ? (
-          <p>Aucun commentaire pour le moment.</p>
+          <p className="text-muted-foreground">
+            Aucun commentaire pour le moment.
+          </p>
         ) : (
-          <ul>
+          <ul className="flex list-none flex-col gap-4">
             {comments.map((comment) => (
-              <li key={comment.id}>
-                <span>{comment.author.username}</span> : {comment.content}
+              <li
+                key={comment.id}
+                className="flex flex-col gap-1 md:flex-row md:items-start md:justify-end md:gap-4"
+              >
+                <p className="text-right text-sm font-medium md:shrink-0 md:text-left">
+                  {comment.author.username}
+                </p>
+                <div className="w-full min-h-[92px] self-start rounded-lg bg-[#EEEEEE] p-4 text-sm whitespace-pre-wrap md:w-[449px] md:min-h-[100px]">
+                  {comment.content}
+                </div>
               </li>
             ))}
           </ul>
         )}
-        <CreateCommentForm articleId={article.id} />
+        <div className="mt-6">
+          <CreateCommentForm articleId={article.id} />
+        </div>
       </div>
     </article>
   );
