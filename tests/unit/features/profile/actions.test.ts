@@ -9,6 +9,7 @@ import {
 } from "vitest";
 import { revalidatePath } from "next/cache";
 import { createTestUser, resetDb, testPrisma } from "@/tests/setup/db";
+import { prisma } from "@/lib/prisma";
 import { hashPassword, isPasswordVerified } from "@/lib/auth/password";
 
 // `requireAuth` mocked (see .claude/tests/00-conventions.md), resolving to a
@@ -187,5 +188,23 @@ describe("profile actions", () => {
         expect(vi.mocked(revalidatePath)).not.toHaveBeenCalled();
       },
     );
+  });
+
+  describe("unexpected errors are not swallowed", () => {
+    it("updateUserInformation rethrows an error that is not a unique-constraint violation", async () => {
+      vi.spyOn(prisma.user, "update").mockRejectedValueOnce(new Error("boom"));
+
+      await expect(
+        updateUserInformation(
+          undefined,
+          toFormData({
+            username: "renamed",
+            email: "renamed@mdd-test.local",
+            password: NEW_PASSWORD,
+          }),
+        ),
+      ).rejects.toThrow("boom");
+      expect(vi.mocked(revalidatePath)).not.toHaveBeenCalled();
+    });
   });
 });

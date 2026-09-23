@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import {
   createTestArticle,
   createTestSubscription,
@@ -10,8 +11,7 @@ import {
   testPrisma,
 } from "@/tests/setup/db";
 
-// The session mechanism is tested in the Auth story: here `requireAuth` is
-// mocked (see .claude/tests/00-conventions.md). It resolves to the id of a
+// Here `requireAuth` is mocked. It resolves to the id of a
 // real user created in `beforeEach`, because articles have a foreign key on
 // their author. `getSubscriptionsByUser` is NOT mocked: real `Subscription`
 // rows in the test database exercise the real join.
@@ -245,6 +245,33 @@ describe("articles actions", () => {
       expect(result).toEqual({ message: "Ce thème n'existe pas", values });
       expect(await testPrisma.article.count()).toBe(0);
       expect(vi.mocked(redirect)).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("createArticle: edge cases on the submitted form", () => {
+    it("rethrows an unexpected error (only a foreign-key violation is turned into a message)", async () => {
+      const theme = await createTestTheme();
+      vi.spyOn(prisma.article, "create").mockRejectedValueOnce(
+        new Error("boom"),
+      );
+
+      await expect(
+        createArticle(
+          undefined,
+          toFormData({
+            themeId: theme.id,
+            title: "A valid article title",
+            content: LONG_CONTENT,
+          }),
+        ),
+      ).rejects.toThrow("boom");
+    });
+
+    it("returns empty strings as `values` when fields are missing from the form", async () => {
+      const result = await createArticle(undefined, new FormData());
+
+      expect(result?.values).toEqual({ themeId: "", title: "", content: "" });
+      expect(result?.errors).toBeDefined();
     });
   });
 });

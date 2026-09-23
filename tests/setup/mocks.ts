@@ -25,8 +25,7 @@ vi.mock("next/cache", () => ({
 /**
  * `cookies()` (used by `lib/auth/session.ts`) only works inside a real Next.js
  * request. Replaced by a stateful in-memory cookie jar (see
- * `tests/setup/cookies.ts`). Only the Auth story exercises it for real: the
- * other features mock `@/lib/auth/session` itself.
+ * `tests/setup/cookies.ts`).
  */
 vi.mock("next/headers", () => ({
   cookies: async () => cookieStoreMock,

@@ -3,9 +3,9 @@ import { createTestTheme, resetDb } from "@/tests/setup/db";
 
 // `getThemes` is guarded by `requireAuth()` (lib/auth/session.ts). This
 // feature isn't what's under test here, so it's mocked to resolve to a
-// fixed user id — see .claude/tests/00-conventions.md ("Mocks Next.js") for
+// fixed user id .
 // why: the session mechanism itself (cookies, JWT) is tested once, in
-// depth, in the Auth story (.claude/tests/02-auth.md).
+// depth.
 vi.mock("@/lib/auth/session", () => ({
   requireAuth: vi.fn().mockResolvedValue("test-user-id"),
 }));

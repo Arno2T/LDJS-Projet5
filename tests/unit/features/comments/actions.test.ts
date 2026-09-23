@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/prisma";
 import {
   createTestArticle,
   createTestComment,
@@ -9,7 +10,7 @@ import {
   testPrisma,
 } from "@/tests/setup/db";
 
-// `requireAuth` mocked (see .claude/tests/00-conventions.md), resolving to a
+// `requireAuth` mocked, resolving to a
 // real user created in `beforeEach` because comments have a foreign key on
 // their author.
 vi.mock("@/lib/auth/session", () => ({
@@ -169,6 +170,31 @@ describe("comments actions", () => {
       });
       expect(await testPrisma.comment.count()).toBe(0);
       expect(vi.mocked(revalidatePath)).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("createComment: edge cases", () => {
+    it("rethrows an unexpected error (only a foreign-key violation is turned into a message)", async () => {
+      vi.spyOn(prisma.comment, "create").mockRejectedValueOnce(
+        new Error("boom"),
+      );
+
+      await expect(
+        createComment.bind(null, article.id)(
+          undefined,
+          toFormData({ content: "hello" }),
+        ),
+      ).rejects.toThrow("boom");
+    });
+
+    it("returns an empty string as `values.content` when the field is missing", async () => {
+      const result = await createComment.bind(null, article.id)(
+        undefined,
+        new FormData(),
+      );
+
+      expect(result?.values).toEqual({ content: "" });
+      expect(result?.errors?.content).toBeDefined();
     });
   });
 });

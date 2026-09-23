@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/prisma";
 import {
   createTestSubscription,
   createTestTheme,
@@ -162,6 +163,18 @@ describe("subscriptions actions", () => {
       // The other user's subscription is untouched.
       expect(await testPrisma.subscription.count()).toBe(1);
       expect(vi.mocked(revalidatePath)).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("unsubscribe: unexpected errors", () => {
+    it("rethrows an error that is not P2025 (only 'not subscribed' is swallowed)", async () => {
+      vi.spyOn(prisma.subscription, "delete").mockRejectedValueOnce(
+        new Error("boom"),
+      );
+
+      await expect(
+        unsubscribe("some-theme-id", new FormData()),
+      ).rejects.toThrow("boom");
     });
   });
 });

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { vi } from "vitest";
 import { cookieJar } from "@/tests/setup/cookies";
 import { createTestUser, resetDb, testPrisma } from "@/tests/setup/db";
+import { prisma } from "@/lib/prisma";
 import { hashPassword, isPasswordVerified } from "@/lib/auth/password";
 import { getSession } from "@/lib/auth/session";
 import {
@@ -14,7 +15,6 @@ import {
 
 // Here `@/lib/auth/session` is deliberately NOT mocked: the real JWT/cookie
 // mechanism runs against the in-memory cookie jar (tests/setup/cookies.ts).
-// See .claude/tests/02-auth.md.
 
 const PASSWORD = "Abcdef12";
 const GENERIC_LOGIN_ERROR = "Email ou mot de passe non valide";
@@ -192,6 +192,24 @@ describe("auth actions", () => {
       expect(await getSession()).toBeNull();
       expect(cookieJar.optionsOf("userSession")).toBeUndefined();
       expect(vi.mocked(redirect)).toHaveBeenCalledWith("/");
+    });
+  });
+
+  describe("unexpected errors are not swallowed", () => {
+    it("registerUser rethrows an error that is not a unique-constraint violation", async () => {
+      vi.spyOn(prisma.user, "create").mockRejectedValueOnce(new Error("boom"));
+
+      await expect(
+        registerUser(
+          undefined,
+          toFormData({
+            username: "bobby",
+            email: "bobby@mdd-test.local",
+            password: PASSWORD,
+          }),
+        ),
+      ).rejects.toThrow("boom");
+      expect(await getSession()).toBeNull();
     });
   });
 });
