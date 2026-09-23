@@ -5,28 +5,11 @@ import type { Theme } from "@prisma/client";
 import { createArticle } from "@/features/articles/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FieldErrors } from "@/components/FieldErrors";
 
 type Props = {
   themes: Theme[];
 };
-
-/**
- * List of validation messages for one field, linked to it through `id`
- * (see `aria-describedby` on the field).
- */
-function FieldErrors({ id, errors }: { id: string; errors?: string[] }) {
-  if (!errors?.length) {
-    return null;
-  }
-
-  return (
-    <ul id={id} className="text-sm text-destructive">
-      {errors.map((msg) => (
-        <li key={msg}>{msg}</li>
-      ))}
-    </ul>
-  );
-}
 
 /**
  * Article creation form (Client Component).
