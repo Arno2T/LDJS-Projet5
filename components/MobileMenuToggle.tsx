@@ -11,7 +11,10 @@ const MobileMenuToggle = ({
 
   return (
     <>
-      <button onClick={() => setIsOpen(!isOpen)}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
+      >
         {isOpen ? <X /> : <MenuIcon />}
       </button>
       {isOpen && (

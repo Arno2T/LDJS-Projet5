@@ -41,7 +41,7 @@ const Menu = () => {
         >
           Thèmes
         </Link>
-        <Link href="/profile">
+        <Link href="/profile" aria-label="Profil utilisateur">
           <ProfileIcon />
         </Link>
       </div>
@@ -69,7 +69,7 @@ const Menu = () => {
               Thèmes
             </Link>
           </div>
-          <Link href="/profile">
+          <Link href="/profile" aria-label="Profil utilisateur">
             <ProfileIcon />
           </Link>
         </MobileMenuToggle>

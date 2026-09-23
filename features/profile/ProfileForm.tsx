@@ -23,6 +23,7 @@ export function ProfileForm({ userInfo }: Props) {
       <Input
         id="username"
         name="username"
+        aria-label="Nom d'utilisateur"
         defaultValue={userInfo?.username}
         type="text"
         className="h-[48px] w-[250px] md:w-[281px]"
@@ -30,6 +31,7 @@ export function ProfileForm({ userInfo }: Props) {
       <Input
         id="email"
         name="email"
+        aria-label="Adresse e-mail"
         defaultValue={userInfo?.email}
         type="email"
         className="h-[48px] w-[250px] md:w-[281px]"
