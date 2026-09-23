@@ -94,3 +94,23 @@ export async function createTestArticle(overrides: {
 export async function createTestSubscription(userId: string, themeId: string) {
   return testPrisma.subscription.create({ data: { userId, themeId } });
 }
+
+/**
+ * Creates a `Comment` fixture. `authorId` and `articleId` must reference
+ * existing rows (foreign keys). `createdAt` can be forced to test sorting.
+ */
+export async function createTestComment(overrides: {
+  authorId: string;
+  articleId: string;
+  content?: string;
+  createdAt?: Date;
+}) {
+  return testPrisma.comment.create({
+    data: {
+      content: overrides.content ?? "Test comment",
+      authorId: overrides.authorId,
+      articleId: overrides.articleId,
+      ...(overrides.createdAt && { createdAt: overrides.createdAt }),
+    },
+  });
+}
