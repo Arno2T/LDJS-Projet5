@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Send } from "lucide-react";
 import { createComment } from "@/features/comments/actions";
 import { Button } from "@/components/ui/button";
 import { FieldErrors } from "@/components/FieldErrors";
@@ -29,28 +30,33 @@ export function CreateCommentForm({ articleId }: Props) {
 
   return (
     <form action={formAction} className="flex flex-col gap-2">
-      <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2 md:justify-end">
         <textarea
           id="content"
           name="content"
-          placeholder="Ajouter un commentaire"
-          aria-label="Ajouter un commentaire"
+          placeholder="Écrivez ici votre commentaire"
+          aria-label="Écrivez ici votre commentaire"
           aria-invalid={!!state?.errors?.content}
           aria-describedby={
             state?.errors?.content ? "content-error" : undefined
           }
           defaultValue={state?.values?.content}
-          rows={3}
-          className="w-full rounded-lg border border-primary bg-background p-2 aria-invalid:border-destructive"
+          rows={1}
+          className="h-[120px] w-full resize-none rounded-lg border border-input bg-background p-2 aria-invalid:border-destructive md:w-[570px]"
         />
-        <FieldErrors id="content-error" errors={state?.errors?.content} />
+        <Button
+          type="submit"
+          variant="outline"
+          disabled={pending}
+          aria-label="Envoyer le commentaire"
+          className="h-[48px] w-[48px] shrink-0 rounded-lg border-white bg-background p-0 text-primary"
+        >
+          <Send strokeWidth={2.5} className="size-9" />
+        </Button>
       </div>
 
+      <FieldErrors id="content-error" errors={state?.errors?.content} />
       {state?.message && <p className="text-sm">{state.message}</p>}
-
-      <Button type="submit" disabled={pending} className="self-start">
-        Envoyer
-      </Button>
     </form>
   );
 }
