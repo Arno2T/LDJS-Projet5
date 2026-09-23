@@ -13,6 +13,11 @@ import path from "node:path";
  */
 config({ path: path.resolve(process.cwd(), ".env.test") });
 
+// `lib/auth/session.ts` reads `JWT_SECRET` when the module is loaded, so it
+// must exist before any test imports it. `.env.test` normally provides it;
+// this fallback keeps the suite runnable if the file lacks the variable.
+process.env.JWT_SECRET ??= "test-secret-key";
+
 /**
  * Safety guard: refuses to run if `DATABASE_URL` does not look like the
  * dedicated test database. `tests/setup/db.ts` exposes `resetDb()`, which
