@@ -77,7 +77,7 @@ export default async function Page({
                 <p className="text-right text-sm font-medium md:shrink-0 md:text-left">
                   {comment.author.username}
                 </p>
-                <div className="w-full min-h-[92px] self-start rounded-lg bg-[#EEEEEE] p-4 text-sm whitespace-pre-wrap md:w-[449px] md:min-h-[100px]">
+                <div className="w-full min-h-[92px] self-start rounded-lg bg-[#EEEEEE] p-4 text-sm wrap-break-word whitespace-pre-wrap md:w-[449px] md:min-h-[100px]">
                   {comment.content}
                 </div>
               </li>
