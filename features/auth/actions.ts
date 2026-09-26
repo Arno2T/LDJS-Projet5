@@ -53,7 +53,7 @@ export const registerUser = async (
     throw error;
   }
 
-  redirect("/themes");
+  redirect("/articles");
 };
 
 export const login = async (
@@ -87,8 +87,7 @@ export const login = async (
   const token = await createSession(user.id);
   await setSessionCookie(token);
 
-  // TODO: redirect to articles
-  redirect("/themes");
+  redirect("/articles");
 };
 
 export const getCurrentUser = async (): Promise<User | null> => {
