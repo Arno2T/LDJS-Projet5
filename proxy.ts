@@ -4,6 +4,20 @@ import { getSession } from "./lib/auth/session";
 // Routes accessible without being authenticated
 const publicRoutes = ["/", "/login", "/register"];
 
+/**
+ * Route guard, run for every request matched by `config.matcher` below.
+ *
+ * Logic: an unauthenticated request to a protected route is redirected to
+ * `/login`; conversely, an authenticated request to a public route (home,
+ * login, register) is redirected to `/articles`, so a signed-in user never
+ * sees the login/register forms again. Every other case is let through
+ * unchanged. This is a first line of defense — `requireAuth()` is still
+ * called again inside each protected Server Action/Server Component as a
+ * second, redundant check.
+ *
+ * @param request - The incoming request.
+ * @returns A redirect response, or `NextResponse.next()` to continue.
+ */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublicRoute = publicRoutes.includes(path);
