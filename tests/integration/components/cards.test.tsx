@@ -32,7 +32,8 @@ describe("ArticleCard", () => {
     expect(
       screen.getByRole("link", { name: "Learning TypeScript" }),
     ).toHaveAttribute("href", "/articles/article-1");
-    expect(screen.getByText(/15\/03\/2026 · bobby/)).toBeInTheDocument();
+    expect(screen.getByText("15/03/2026")).toBeInTheDocument();
+    expect(screen.getByText("bobby")).toBeInTheDocument();
     expect(
       screen.getByText("A long content about TypeScript generics."),
     ).toBeInTheDocument();
