@@ -19,7 +19,7 @@ const ArticleCard = ({ article }: { article: ArticleWithAuthor }) => {
           >
             {article.title}
           </Link>
-          <div className="flex mt-1.5">
+          <div className="flex mt-1.5 gap-x-3">
             <CardDescription className="h-6 font-normal text-black leading-6 md:w-[137px]">
               {new Date(article.createdAt).toLocaleDateString("fr-FR")}
             </CardDescription>
